@@ -2,6 +2,12 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 
 const appointmentSchema = new mongoose.Schema({
+    requestPerson:{
+        type:String,
+        required:true,
+        minLength: [3, "First Name must contain atleast 3 characters."]
+
+    },
 
     firstName:{
         type: String,

@@ -4,6 +4,7 @@ const cookieParser = require("cookie-parser");
 const dbConnection = require("./database/dbConnection");
 const UserRoutes = require("./routes/userRoutes");
 const DocumentRoutes = require("./routes/docRoutes");
+const appointmentRoutes = require("./routes/appointmentRoutes")
 
 require("dotenv").config();
 
@@ -19,6 +20,7 @@ app.use(express.json());
 //routes
 app.use("/api/auth", UserRoutes);
 app.use("/api/docs", DocumentRoutes);
+app.use("/appointment", appointmentRoutes);
 
 
 //database connection

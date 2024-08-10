@@ -4,25 +4,65 @@ const User = require("../models/userModel");
 
 module.exports.postAppointment = async(req,res,next) => {
 
-    const {firstName, lastName, email, phone, year, semester, gender, appointment_date, department} = req.body;
+    const {requestPerson, firstName, lastName, email, phone, year, semester, gender, appointment_date, department} = req.body;
 
+    try {
+        const existing_appointment = await Appointment.findOne({requestPerson: requestPerson, firstName: firstName, appointment_date: appointment_date})
 
-    const appointment = await Appointment.create({firstName, lastName, email, phone, year, semester, gender, appointment_date, department});
+        if(existing_appointment){
+            return res.status(400).json({message:'Appointment exists'})
+        }
 
-    res.status(200).json({
-        success: true,
-        appointment,
-        message: "Appointment Send!",
-    });
+        const appointment = await Appointment.create({requestPerson, firstName, lastName, email, phone, year, semester, gender, appointment_date, department});
+        res.status(201).send(appointment);
+
+        
+    } catch (error) {
+        res.status(500).json({message: "Internal server error"})
+        console.log(error);
+        
+    }
+    
+
+   
+    
 };
 
+module.exports.acceptAppointmentRequest = async(req,res)=>{
+    const appointmentId = req.params.appointmentId;
 
-module.exports.getAllAppointments = async(req, res, next) => {
+    try {
+        const approve = await Appointment.findByIdAndUpdate(appointmentId, {status: "Accepted"}, {new: true})
 
-    const appointments = await Appointment.find();
+        if(approve){
+            res.status(200).json({message: "Appointment accepted!"});
+        }else{
+            res.status(404).json({message: "Appointment not found"});
+        }
+    } catch (error) {
+        res.status(500).json({message: "Internal server error"})
+        console.log(error);
+        
+    }
+}
 
-    res.status(200).json({
-        success: true,
-        appointments,
-    });
+module.exports.getAllAppointmentRequests = async(req, res, next) => {
+    const requestPerson  = req.params.requestPerson;
+    // const firstName = req.params.firstName;
+
+    try{
+        const appointmentRequests = await Appointment.find({
+            requestPerson: requestPerson,
+            status: "Pending"
+        });
+
+        if(!appointmentRequests){
+            return res.status(404).json({message: "appointments not found"})
+        }
+        res.status(200).json(appointmentRequests);
+    }catch(error){
+        res.status(500).json({message: "Internal server error"});
+        console.log(error);
+    }
+    
 };
