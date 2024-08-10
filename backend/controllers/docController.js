@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Document = require('../models/docModel');
 const upload = require('../config/multerConfig');
 const ObjectId = mongoose.Types.ObjectId;
+const path = require("path");
 
 
 // Create a new document along with attached file
@@ -150,5 +151,29 @@ module.exports.restoreDocumentById = async (req, res) => {
 };
 
 
+module.exports.downloadDocumentById = async(req, res) => {
 
+    try{
+        const document = await Document.findById(req.params.id);
+
+        if(!document || !document.fileUrl){
+            return res.status(404).json({
+                error: "Document Not Found!"
+            });
+        }
+
+        const filePath = path.resolve(document.fileUrl);
+
+        res.download(filePath, document.fileOriginalName, (err) => {
+            if (err) {
+                res.status(500).json({ error: 'Failed to download the file' });
+            }
+        });
+    }
+    catch(error){
+        res.status(500).json({
+            error: error.message
+        });
+    }
+};
 
