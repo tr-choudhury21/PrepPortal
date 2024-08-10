@@ -24,7 +24,7 @@ module.exports.postAppointment = async(req,res,next) => {
     }
     
 
-   
+
     
 };
 
