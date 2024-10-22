@@ -18,8 +18,8 @@ app.use(express.json());
 
 
 //routes
-app.use("/api/auth", UserRoutes);
-app.use("/api/docs", DocumentRoutes);
+app.use("/api/v1/auth", UserRoutes);
+app.use("/api/v1/docs", DocumentRoutes);
 app.use("/appointment", appointmentRoutes);
 
 
