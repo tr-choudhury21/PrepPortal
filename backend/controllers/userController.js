@@ -7,9 +7,9 @@ const generateToken = require("../utils/jwtToken");
 module.exports.register = async(req, res, next) => {
 
     try {
-        const{ username, email, password } = req.body;
+        const{ fullName, email, password } = req.body;
 
-        const usernameCheck = await User.findOne({ username });
+        const usernameCheck = await User.findOne({ fullName });
         if(usernameCheck){
             return res.status(400).json({
                 success: false,
@@ -30,7 +30,7 @@ module.exports.register = async(req, res, next) => {
 
         const user = await User.create({
             email,
-            username,
+            fullName,
             password: hashedPassword,
         });
 
@@ -50,9 +50,9 @@ module.exports.register = async(req, res, next) => {
 module.exports.login = async(req, res, next) => {
 
     try {
-        const{ username, password } = req.body;
+        const{ email, password } = req.body;
 
-        const user = await User.findOne({ username });
+        const user = await User.findOne({ email });
         if(!user){
             return res.status(400).json({
                 success: false,
