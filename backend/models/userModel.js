@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const validator = require("validator");
 
 const userSchema = new mongoose.Schema({
-    username:{
+    fullName:{
         type: String,
         required: true,
     },
