@@ -15,22 +15,31 @@ module.exports.createDocument = [
             // console.log("Request Body:", req.body);
             // console.log("Uploaded File:", req.file);
 
-            const { subject,semester, year, content } = req.body;
+            const { subject,semester, year, content, branch } = req.body;
             const document = new Document({
                 _id: new ObjectId(),
                 subject,
                 semester, 
                 year,
                 content,
+                branch,
+                uploadedBy: req.user._id,
                 fileUrl: req.file ? req.file.path : null,
                 fileOriginalName: req.file ? req.file.originalname : null,
                 fileName: req.file ? req.file.filename : null, // File URL from Cloudinary
             });
             await document.save();
-            res.status(201).json(document);
+            res.status(201).json({
+                success: true,
+                message: "Document created successfully",
+                document,
+            });
         }
         catch (error) {
-            res.status(400).json({ error: error.message });
+            res.status(400).json({
+                success: false,
+                error: error.message,
+            });
         }
     }
 
@@ -61,12 +70,30 @@ module.exports.uploadMultipleFiles = async (req, res) => {
 // Get all documents
 module.exports.getAllDocuments = async (req, res) => {
     try {
-        const documents = await Document.find({});
+        const { branch } = req.query;
+        const filter = branch ? { branch } : {};
+        const documents = await Document.find(filter);
         res.status(200).json(documents);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
+
+// Example endpoint in your backend controller
+module.exports.getDocumentsByBranch = async (req, res) => {
+    // const { branch } = req.query;
+    try {
+        const branch = req.query.branch
+
+        const documents = await Document.find({ branch: branch })
+            
+
+        res.status(200).json(documents);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 
 // Get a document by ID
 module.exports.getDocumentById = async (req, res) => {
@@ -111,11 +138,12 @@ module.exports.deleteDocumentById = async (req, res) => {
 // Search documents by query parameters
 module.exports.searchDocuments = async (req, res) => {
     try {
-        const { subject, semester, year } = req.query;
+        const { subject, semester, year, branch } = req.query;
         const query = {};
         if (subject) query.subject = subject;
         if (semester) query.semester = semester;
         if (year) query.year = year;
+        if (branch) query.branch = branch;
         
         const documents = await Document.find(query);
         res.status(200).json(documents);
