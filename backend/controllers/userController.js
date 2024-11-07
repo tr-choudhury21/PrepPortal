@@ -92,3 +92,35 @@ module.exports.logout = async(req, res, next) => {
         message: "User Logged Out!!"
     });
 }
+
+
+
+module.exports.getUserProfile = async (req, res) => {
+    // try {
+    //     // Retrieve the token from cookies
+    //     const token = req.cookies.token;
+    //     if (!token) {
+    //         return res.status(401).json({ error: 'Unauthorized, no token provided' });
+    //     }
+
+    //     // Verify and decode the token
+    //     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    //     // Find the user by decoded user ID and exclude the password field
+    //     const user = await User.findById(decoded.userId).select('-password');
+    //     if (!user) {
+    //         return res.status(404).json({ error: 'User not found' });
+    //     }
+
+    //     // Respond with user details
+    //     res.status(200).json(user);
+    // } catch (error) {
+    //     res.status(500).json({ error: error.message });
+    // }
+
+    const user = req.user;
+    res.status(200).json({
+        success: true,
+        user,
+    });
+};
