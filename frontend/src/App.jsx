@@ -5,29 +5,42 @@ import HomePage from './pages/Home'
 import Login from './pages/Login'
 import Branch from './pages/Branch'
 import Footer from './_components/Footer'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import Profile from './pages/Profile'
 import Upload from './pages/Upload'
 import BranchDocuments from './_components/Document'
+import { Context } from './main'
+import axios from 'axios'
 
 
 const App = () => {
 
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const {isAuthenticated, setIsAuthenticated, setUser} = useContext(Context);
 
   useEffect(()=>{
 
-    const token = localStorage.getItem('token');
-    if(token){
-      setIsAuthenticated(true);
-    }
-  }, []);
+    const fetchUser = async () =>{
+      try {
+        const response = await axios.get("http://localhost:5000/api/v1/auth/userdetails",
+          {
+            withCredentials: true,
+          }
+        );
+        setIsAuthenticated(true);
+        setUser(response.data.user);
+      } catch (error) {
+        setIsAuthenticated(false);
+        setUser({});
+      }
+    };
+    fetchUser();
+  }, [isAuthenticated]);
 
 
   return (
     <Router>
       <div>
-        <Navbar isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated} />
+        <Navbar />
         <Routes>
           <Route path="/" element={<HomePage />}/>
           <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
