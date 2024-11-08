@@ -27,7 +27,7 @@ PrepPortal is a MERN stack application that enables alumni and senior students o
 
 ![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
 
-![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
+![App Screenshot]([https://via.placeholder.com/468x300?text=App+Screenshot+Here](https://github.com/tr-choudhury21/PrepPortal/blob/d3c2183e104c802e0f870abaace799a71f844019/Screenshot%202024-11-08%20215550.png))
 
 
 ## Installation
