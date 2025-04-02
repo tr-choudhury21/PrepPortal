@@ -95,32 +95,54 @@ module.exports.logout = async(req, res, next) => {
 
 
 
+
+
+// module.exports.getUserProfile = async (req, res) => {
+//     const user = req.user;
+//     res.status(200).json({
+//         success: true,
+//         user,
+//     });
+// };
+
+
 module.exports.getUserProfile = async (req, res) => {
-    // try {
-    //     // Retrieve the token from cookies
-    //     const token = req.cookies.token;
-    //     if (!token) {
-    //         return res.status(401).json({ error: 'Unauthorized, no token provided' });
-    //     }
+    try {
+        const user = await User.findById(req.user._id).select("-password");
+        
+        res.status(200).json({
+            success: true,
+            user,
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Error retrieving user profile",
+        });
+    }
+};
 
-    //     // Verify and decode the token
-    //     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    //     // Find the user by decoded user ID and exclude the password field
-    //     const user = await User.findById(decoded.userId).select('-password');
-    //     if (!user) {
-    //         return res.status(404).json({ error: 'User not found' });
-    //     }
 
-    //     // Respond with user details
-    //     res.status(200).json(user);
-    // } catch (error) {
-    //     res.status(500).json({ error: error.message });
-    // }
 
-    const user = req.user;
-    res.status(200).json({
-        success: true,
-        user,
-    });
+
+module.exports.updateProfile = async (req, res, next) => {
+    try {
+        const userId = req.user._id;
+        const { fullName, avatar, bio, socialLinks } = req.body;
+
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { fullName, avatar, bio, socialLinks },
+            { new: true, runValidators: true }
+        );
+
+        res.status(200).json({
+            success: true,
+            message: "Profile updated successfully",
+            user: updatedUser,
+        });
+    } catch (error) {
+        next(error);
+    }
 };
