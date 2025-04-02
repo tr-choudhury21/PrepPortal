@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Document = require('../models/docModel');
+const User = require('../models/userModel');
 const upload = require('../config/multerConfig');
 const ObjectId = mongoose.Types.ObjectId;
 const path = require("path");
@@ -29,6 +30,7 @@ module.exports.createDocument = [
                 fileName: req.file ? req.file.filename : null, // File URL from Cloudinary
             });
             await document.save();
+            await document.populate('uploadedBy', 'fullName');
             res.status(201).json({
                 success: true,
                 message: "Document created successfully",
@@ -46,6 +48,12 @@ module.exports.createDocument = [
 ];
 
 
+
+
+
+
+
+
 //Simply for uploading files
 
 module.exports.uploadFile = async(req, res) => {
@@ -56,6 +64,10 @@ module.exports.uploadFile = async(req, res) => {
     }
 };
 
+
+
+
+
 // Upload multiple files
 module.exports.uploadMultipleFiles = async (req, res) => {
     if (req.files && req.files.length > 0) {
@@ -65,6 +77,12 @@ module.exports.uploadMultipleFiles = async (req, res) => {
         res.status(400).json({ error: 'No files uploaded' });
     }
 };
+
+
+
+
+
+
 
 
 // Get all documents
@@ -79,13 +97,19 @@ module.exports.getAllDocuments = async (req, res) => {
     }
 };
 
-// Example endpoint in your backend controller
+
+
+
+
+
+
+// Get a document by branch
 module.exports.getDocumentsByBranch = async (req, res) => {
     // const { branch } = req.query;
     try {
         const branch = req.query.branch
 
-        const documents = await Document.find({ branch: branch })
+        const documents = await Document.find({ branch: branch });
             
 
         res.status(200).json(documents);
@@ -95,10 +119,15 @@ module.exports.getDocumentsByBranch = async (req, res) => {
 };
 
 
+
+
+
+
+
 // Get a document by ID
 module.exports.getDocumentById = async (req, res) => {
     try {
-        const document = await Document.findById(req.params.id);
+        const document = await Document.findById(req.params.id).populate('uploadedBy', 'fullName');
         if (!document) {
         return res.status(404).json({ error: 'Document not found' });
         }
@@ -107,6 +136,12 @@ module.exports.getDocumentById = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+
+
+
+
+
 
 // Update a document by ID
 module.exports.updateDocumentById = async (req, res) => {
@@ -121,6 +156,12 @@ module.exports.updateDocumentById = async (req, res) => {
     }
 };
 
+
+
+
+
+
+
 // Delete a document by ID
 module.exports.deleteDocumentById = async (req, res) => {
     try {
@@ -133,6 +174,11 @@ module.exports.deleteDocumentById = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+
+
+
+
 
 
 // Search documents by query parameters
@@ -152,6 +198,11 @@ module.exports.searchDocuments = async (req, res) => {
     }
 };
 
+
+
+
+
+
 // Archive a document by ID
 module.exports.archiveDocumentById = async (req, res) => {
     try {
@@ -165,6 +216,11 @@ module.exports.archiveDocumentById = async (req, res) => {
     }
 };
 
+
+
+
+
+
 // Restore an archived document by ID
 module.exports.restoreDocumentById = async (req, res) => {
     try {
@@ -177,6 +233,10 @@ module.exports.restoreDocumentById = async (req, res) => {
         res.status(400).json({ error: error.message });
     }
 };
+
+
+
+
 
 
 module.exports.downloadDocumentById = async(req, res) => {
@@ -205,3 +265,17 @@ module.exports.downloadDocumentById = async(req, res) => {
     }
 };
 
+
+
+
+
+//Get the user's uploaded document
+module.exports.getUserDocuments = async (req, res) => {
+    try {
+        const userId = req.user._id; // Assuming you have middleware to set req.user
+        const documents = await Document.find({ uploadedBy: userId });
+        res.status(200).json(documents);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};

@@ -10,7 +10,8 @@ const {createDocument,
     restoreDocumentById, 
     deleteDocumentById,
     downloadDocumentById,
-    getDocumentsByBranch
+    getDocumentsByBranch,
+    getUserDocuments
 } = require('../controllers/docController');
 const upload = require('../config/multerConfig');
 const isUserAuthenticated = require('../middlewares/auth');
@@ -32,6 +33,7 @@ router.get("/getalldocumentsbybranch", getDocumentsByBranch);
 router.get("/getdocument/:id", getDocumentById);
 router.get("/search", searchDocuments);
 router.get("/documents/:id/download", downloadDocumentById);
+router.get("/userdocuments",isUserAuthenticated, getUserDocuments);
 
 
 router.put("update/:id",isUserAuthenticated, updateDocumentById);

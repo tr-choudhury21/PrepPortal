@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+
 const documentSchema = new mongoose.Schema({
     subject: {
         type: String,
@@ -33,7 +34,7 @@ const documentSchema = new mongoose.Schema({
     },
     uploadedBy: { // New field for uploader's name or ID
         type: mongoose.Schema.Types.ObjectId, // Stores reference to a User object
-        ref: 'User', // Assumes a User model exists
+        ref: 'Users', // Assumes a User model exists
         required: true,
     },
     createdAt: {
