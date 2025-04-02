@@ -1,218 +1,156 @@
-// import {
-//     Card,
-//     CardContent,
-//     CardDescription,
-//     CardFooter,
-//     CardHeader,
-//     CardTitle,
-// } from "@/components/ui/card"
-
-// import {Button} from "@/components/ui/button"
-// import { Label } from "@/components/ui/label";
-// import { Input } from "@/components/ui/input";
-// import { useState } from "react";
-// import { useNavigate } from "react-router-dom";
-// import axios from "axios";
-
-
-// function Login(){
-
-//   const navigateTo = useNavigate();
-
-
-//   const [username, setUsername] = useState('');
-//   const [password, setPassword] = useState('');
-//   const [showPassword, setShowPassword] = useState(false); 
-
-//   const togglePasswordVisibility = () => {
-//       setShowPassword(!showPassword);
-//   }
-
-//   const handleSubmit = async (e) => {
-//       e.preventDefault();
-
-//       try {
-//           const response = await axios.post("http://localhost:5000/api/v1/auth/login", {
-//               username,
-//               password
-//           });
-
-//           console.log("User Logged In successfully ", response.data);
-//           navigateTo('/');
-
-//       } catch (error) {
-//           console.log("error logging up", error);
-//       }
-
-//   };
-
-//   return (
-//   <div className="flex justify-center items-center min-h-screen">
-//       <Card>
-//           <CardHeader className="space-y-1">
-//               <CardTitle className="text-center text-2xl">Login Page</CardTitle>
-//               <CardDescription>
-//                   Enter your details to Login into your account
-//               </CardDescription>
-//           </CardHeader>
-//           <form onSubmit={handleSubmit}>
-//               <CardContent className="grid gap-4">
-//                   <div className="relative">
-//                       <div className="absolute inset-0 flex items-center">
-//                       {/* <span className="w-full border-t" /> */}
-//                       </div>
-//                       <div className="relative flex justify-center text-xs uppercase">
-//                       {/* <span className="bg-background px-2 text-muted-foreground">
-//                           Or continue with
-//                       </span> */}
-//                       </div>
-//                   </div>
-//                   <div className="grid gap-2">
-//                       <Label htmlFor="username">Username</Label>
-//                       <Input 
-//                           id="username" 
-//                           type="username" 
-//                           placeholder="xyz"
-//                           value={username}
-//                           onChange={(e) => setUsername(e.target.value)}
-//                       />
-//                   </div>
-//                   <div className="grid gap-2 relative">
-//                       <Label htmlFor="password">Password</Label>
-//                       <Input 
-//                           id="password" 
-//                           type={showPassword ? "text" : "password"} 
-//                           placeholder="*****"
-//                           value={password}
-//                           onChange={(e) => setPassword(e.target.value)}
-//                       />
-//                       <Button
-//                           type='button'
-//                           onClick={togglePasswordVisibility}
-//                           className="absolute right-0 top-5 text-sm"
-//                       >
-//                           {showPassword ? "Hide" : "Show"}
-//                       </Button>
-//                   </div>
-//               </CardContent>
-//               <CardFooter>
-//                   <Button type="submit" className="w-full">Login</Button>
-//               </CardFooter>
-//           </form>
-
-//       </Card>
-//   </div>
-//   )
-
-// }
-
-// export default Login;
-
-
 // src/pages/Login.js
-import React, { useState } from 'react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import React, { useContext, useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { Context } from "@/main";
 
-const Login = ({ setIsAuthenticated }) => {
-    const [isLoginMode, setIsLoginMode] = useState(true); // State to toggle between login and register
-    const [fullName, setFullName] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const navigate = useNavigate();
-    
-      // Handle input change
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
-    
-      // Handle form submit for Login/Signup
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-            try {
-                const endpoint = isLoginMode ? 'http://localhost:5000/api/v1/auth/login' : 'http://localhost:5000/api/v1/auth/register';
+const Login = () => {
+  const { setIsAuthenticated, setUser } = useContext(Context);
+  const [isLoginMode, setIsLoginMode] = useState(true); // State to toggle between login and register
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
-                const data = isLoginMode ? { email, password } : { fullName, email, password };
-                // Send request with credentials for cookie-based auth
-                const response = await axios.post(endpoint, data, { withCredentials: true });
+  // Handle form submit for Login/Signup
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const endpoint = isLoginMode
+        ? "http://localhost:5000/api/v1/auth/login"
+        : "http://localhost:5000/api/v1/auth/register";
 
-                if (response.data.success) {
-                  setIsAuthenticated(true); // Set auth state to true on successful login or register
-                  navigate('/'); // Redirect to the homepage
-                }
-            } catch (error) {
-                console.error(isLoginMode ? 'Login failed:' : 'Registration failed:', error);
-            }
-    };
+      const data = isLoginMode
+        ? { email, password }
+        : { fullName, email, password };
+      // Send request with credentials for cookie-based auth
+      const response = await axios.post(endpoint, data, {
+        withCredentials: true,
+      });
 
-    return (
-        <div className="flex justify-center items-center h-screen bg-gray-50">
-            <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
-                <h2 className="text-2xl font-bold mb-4">{isLoginMode ? 'Login' : 'Register'}</h2>
-        
-                {/* {error && <p className="text-red-600 mb-4">{error}</p>} */}
-        
-                <form onSubmit={handleSubmit}>
-                {!isLoginMode && (
-                    <div className="mb-4">
-                    <label className="block text-sm font-medium">Full Name</label>
-                    <Input
-                        type="text"
-                        placeholder="Full Name"
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
-                        className="w-full mb-4 p-2 border border-gray-300 rounded"
-                        required={!isLoginMode}
-                    />
-                    </div>
-                )}
-                
-                <div className="mb-4">
-                    <label className="block text-sm font-medium">Email</label>
-                    <Input
-                        type="email"
-                        placeholder="Email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="w-full mb-4 p-2 border border-gray-300 rounded"
-                        required
-                    />
-                </div>
-        
-                <div className="mb-4">
-                    <label className="block text-sm font-medium">Password</label>
-                    <Input
-                        type="password"
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="w-full mb-4 p-2 border border-gray-300 rounded"
-                        required
-                    />
-                </div>
-        
-                <Button type="submit" className="w-full bg-blue-600 text-white">
-                    {isLoginMode ? 'Login' : 'Register'}
-                </Button>
-                </form>
-        
-                <p className="text-sm mt-4">
-                {isLoginMode ? "Don't have an account?" : "Already have an account?"}
-                <span
-                    onClick={() => {
-                        setIsLoginMode(!isLoginMode);
-                    }}
-                    className="text-blue-600 cursor-pointer ml-1"
-                >
-                    {!isLoginMode ? 'Login' : 'Register'}
-                </span>
-                </p>
-            </div>
+      if (response.data.success) {
+        setIsAuthenticated(true);
+        setUser(response.data.user); // Set auth state to true on successful login or register
+        navigate("/"); // Redirect to the homepage
+      }
+    } catch (error) {
+      console.error(
+        isLoginMode ? "Login failed:" : "Registration failed:",
+        error
+      );
+    }
+  };
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4">
+      <div className="flex w-full max-w-4xl overflow-hidden rounded-2xl shadow-lg bg-white">
+        {/* Left Side */}
+        <div className="hidden md:flex w-1/2 bg-gradient-to-r from-purple-500 to-orange-400 p-10 text-white flex-col justify-center items-center">
+          <h2 className="text-4xl font-bold">Welcome to PrepPortal</h2>
+          <h3 className="text-xl font-semibold mt-4">
+            Your go-to platform for placement & academic preparation
+          </h3>
         </div>
-    );
+        {/* Right Side */}
+        <div className="w-full md:w-1/2 p-6 flex flex-col justify-center">
+          <Card className="w-full">
+            <CardHeader>
+              <h2 className="text-2xl font-bold">
+                {isLoginMode ? "Login" : "Register"}
+              </h2>
+              <p className="text-gray-500 text-sm">
+                Welcome <span>{isLoginMode ? "back!" : " "}</span> Please{" "}
+                <span>{isLoginMode ? "Login" : "Register"}</span> to your
+                account.
+              </p>
+            </CardHeader>
+            <form onSubmit={handleSubmit}>
+              <CardContent>
+                {!isLoginMode && (
+                  <div className="mb-4">
+                    <Label htmlFor="fullName">Full Name</Label>
+                    <Input
+                      type="text"
+                      placeholder="e.g John Doe"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      className="w-full mb-4 p-2 border border-gray-300 rounded"
+                      required={!isLoginMode}
+                    />
+                  </div>
+                )}
+                <div className="mb-4">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="e.g. johndoe@gmail.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="mb-4">
+                  <Label htmlFor="password">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="********"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                </div>
+                {isLoginMode ? (
+                  <div className="flex justify-between items-center mb-4">
+                    <div className="flex items-center">
+                      <input type="checkbox" id="remember" className="mr-2" />
+                      <Label htmlFor="remember">Remember Me</Label>
+                    </div>
+                    <a
+                      href="#"
+                      className="text-sm text-purple-600 hover:underline">
+                      Forgot Password?
+                    </a>
+                  </div>
+                ) : (
+                  <div></div>
+                )}
+              </CardContent>
+              <CardFooter className="flex flex-col">
+                <Button
+                  type="submit"
+                  className="w-full bg-purple-600 hover:bg-purple-700">
+                  {isLoginMode ? "Login" : "Register"}
+                </Button>
+                <p className="text-sm text-center mt-4">
+                  {isLoginMode
+                    ? "Don't have an account?"
+                    : "Already have an account?"}
+                  <span
+                    onClick={() => {
+                      setIsLoginMode(!isLoginMode);
+                    }}
+                    className="text-purple-600 cursor-pointer ml-1">
+                    {!isLoginMode ? "Login" : "Register"}
+                  </span>
+                </p>
+              </CardFooter>
+            </form>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Login;
-
